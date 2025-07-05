@@ -80,7 +80,7 @@ class budgetApp(tk.Tk):
         ttk.Label(frame, text="日付 (YYYY-MM-DD)").grid(row=0, column=0, sticky=tk.W, pady=2)
         self.date_var = tk.StringVar()
         self.date_entry = ttk.Entry(frame, textvariable=self.date_var)
-        self.date_entry.grid(row=0, column=1, sticky=tk.W, pady=2)
+        self.date_entry.grid(row=0, column=1)
         self.date_entry.bind("<KeyRelease>", self.on_date_entry)
 
         ttk.Label(frame, text="項目").grid(row=1, column=0, sticky=tk.W, pady=2)
@@ -149,20 +149,19 @@ class budgetApp(tk.Tk):
 
     def on_date_entry(self, event):
         value = self.date_var.get().replace("-", "")
-        if len(value) > 8:
-            value = value[:8]
-        new_value = ""
-        if len(value) >= 4:
-            new_value += value[:4]  # 年
-            if len(value) >= 6:
-                new_value += "-" + value[4:6]  # 月
-                if len(value) > 6:
-                    new_value += "-" + value[6:8]  # 日
-            elif len(value) > 4:
-                new_value += "-" + value[4:]
-        else:
-            new_value += value
-        self.date_var.set(new_value)
+        
+        # 数字以外は除去
+        value = ''.join(filter(str.isdigit, value))
+        
+        # 8桁になったら自動整形
+        if len(value) == 8:
+            year = value[:4]
+            month = value[4:6]
+            day = value[6:8]
+            formatted = f"{year}-{month}-{day}"
+            self.date_var.set(formatted)
+            # カーソルを末尾に
+            self.date_entry.icursor(tk.END)
 
     def on_delete(self):
         selected = self.tree.selection()
